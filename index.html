@@ -3,18 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MS මාධ්‍යය - 3D ගස Project (Interactive)</title>
+<title>MS මාධ්‍යය - 3D ගස Project</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: 'Iskoola Pota', 'Noto Sans Sinhala', sans-serif;
-    background: #0a0e27;
-    overflow: hidden;
-    color: #fff;
+    background: #0a0e27; overflow: hidden; color: #fff;
   }
   #canvas-container { width: 100vw; height: 100vh; display: block; }
 
-  /* ── Title ── */
   #title {
     position: absolute; top: 20px; left: 50%;
     transform: translateX(-50%);
@@ -27,7 +24,6 @@
   #title h1 { font-size: 20px; color: #ffd700; }
   #title p { font-size: 12px; color: #b8c6db; margin-top: 4px; }
 
-  /* ── Legend ── */
   #legend {
     position: absolute; bottom: 20px; left: 20px;
     background: rgba(10, 14, 39, 0.9);
@@ -40,8 +36,7 @@
     border-bottom: 1px solid #4a9eff; padding-bottom: 5px;
   }
   .legend-item {
-    display: flex; align-items: center;
-    margin: 6px 0; font-size: 12px;
+    display: flex; align-items: center; margin: 6px 0; font-size: 12px;
     cursor: pointer; padding: 3px 6px; border-radius: 6px;
     transition: background 0.2s;
   }
@@ -53,7 +48,6 @@
   }
   .legend-item span { color: #e0e6ff; }
 
-  /* ── Info Box ── */
   #info {
     position: absolute; top: 20px; right: 20px;
     background: rgba(10, 14, 39, 0.9);
@@ -71,7 +65,6 @@
     font-size: 11px; color: #ffd700;
   }
 
-  /* ── Controls hint ── */
   #controls {
     position: absolute; bottom: 20px; right: 20px;
     background: rgba(10, 14, 39, 0.9);
@@ -81,7 +74,34 @@
   }
   #controls b { color: #4a9eff; }
 
-  /* ── Loading ── */
+  #video-btn {
+    position: absolute; top: 20px; left: 20px;
+    background: linear-gradient(135deg, #ff6b6b, #c0392b);
+    border: 2px solid #ff6b6b; border-radius: 50px;
+    padding: 12px 24px;
+    color: #fff; font-size: 14px; font-weight: bold;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 24px rgba(255, 107, 107, 0.5);
+    z-index: 20;
+    transition: all 0.3s;
+    animation: pulseVideo 2s infinite;
+  }
+  #video-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(255, 107, 107, 0.7);
+  }
+  #video-btn .play-icon {
+    width: 0; height: 0;
+    border-left: 12px solid #fff;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+  }
+  @keyframes pulseVideo {
+    0%, 100% { box-shadow: 0 8px 24px rgba(255, 107, 107, 0.5); }
+    50%      { box-shadow: 0 8px 40px rgba(255, 107, 107, 0.9); }
+  }
+
   #loading {
     position: fixed; inset: 0; background: #0a0e27;
     display: flex; align-items: center; justify-content: center;
@@ -97,22 +117,19 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   #loading p { margin-top: 20px; color: #ffd700; font-size: 16px; }
 
-  /* ── MODAL (Click කරාම පෙන්නන popup) ── */
   #modal-backdrop {
     position: fixed; inset: 0;
     background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(6px);
     display: none; align-items: center; justify-content: center;
-    z-index: 200; padding: 20px;
-    animation: fadeIn 0.3s ease;
+    z-index: 200; padding: 20px; animation: fadeIn 0.3s ease;
   }
   #modal-backdrop.show { display: flex; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
   #modal {
     background: linear-gradient(135deg, #0f1a3a 0%, #1a1a2e 100%);
-    border-radius: 20px;
-    max-width: 620px; width: 100%;
+    border-radius: 20px; max-width: 620px; width: 100%;
     max-height: 88vh; overflow-y: auto;
     border: 2px solid var(--accent, #ffd700);
     box-shadow: 0 20px 80px rgba(0,0,0,0.8),
@@ -127,17 +144,12 @@
 
   #modal-header {
     padding: 24px 28px 18px;
-    background: linear-gradient(135deg,
-      var(--accent-glow, rgba(255,215,0,0.25)),
-      transparent);
+    background: linear-gradient(135deg, var(--accent-glow, rgba(255,215,0,0.25)), transparent);
     border-bottom: 1px solid rgba(255,255,255,0.1);
-    display: flex; align-items: center; gap: 18px;
-    position: relative;
+    display: flex; align-items: center; gap: 18px; position: relative;
   }
-
   #modal-symbol {
-    width: 76px; height: 76px;
-    border-radius: 50%;
+    width: 76px; height: 76px; border-radius: 50%;
     background: var(--accent, #ffd700);
     display: flex; align-items: center; justify-content: center;
     font-size: 30px; font-weight: bold; color: #0a0e27;
@@ -145,46 +157,29 @@
     box-shadow: 0 0 30px var(--accent-glow, rgba(255,215,0,0.5));
     flex-shrink: 0;
   }
-
   #modal-title-block { flex: 1; }
-  #modal-name {
-    font-size: 22px; font-weight: bold;
-    color: var(--accent, #ffd700);
-    margin-bottom: 4px;
-  }
-  #modal-english {
-    font-size: 13px; color: #8899bb;
-    letter-spacing: 1px;
-  }
+  #modal-name { font-size: 22px; font-weight: bold; color: var(--accent, #ffd700); margin-bottom: 4px; }
+  #modal-english { font-size: 13px; color: #8899bb; letter-spacing: 1px; }
   #modal-type-badge {
     display: inline-block; margin-top: 8px;
     padding: 4px 12px; border-radius: 20px;
     font-size: 11px; font-weight: bold;
-    background: rgba(74, 158, 255, 0.2);
-    color: #4a9eff;
+    background: rgba(74, 158, 255, 0.2); color: #4a9eff;
     border: 1px solid #4a9eff;
   }
   #modal-type-badge.micro {
-    background: rgba(255, 107, 107, 0.2);
-    color: #ff6b6b;
-    border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.2); color: #ff6b6b; border-color: #ff6b6b;
   }
-
   #modal-close {
     position: absolute; top: 15px; right: 15px;
-    width: 36px; height: 36px;
-    border-radius: 50%;
+    width: 36px; height: 36px; border-radius: 50%;
     background: rgba(255, 107, 107, 0.15);
     border: 1px solid rgba(255, 107, 107, 0.4);
     color: #ff6b6b; font-size: 20px;
-    cursor: pointer; display: flex;
-    align-items: center; justify-content: center;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: all 0.2s;
   }
-  #modal-close:hover {
-    background: #ff6b6b; color: #fff;
-    transform: rotate(90deg);
-  }
+  #modal-close:hover { background: #ff6b6b; color: #fff; transform: rotate(90deg); }
 
   #modal-body { padding: 22px 28px 28px; }
 
@@ -192,12 +187,9 @@
     margin-bottom: 18px;
     background: rgba(255, 255, 255, 0.03);
     border-left: 3px solid var(--accent, #ffd700);
-    border-radius: 8px;
-    padding: 14px 16px;
-    transition: background 0.2s;
+    border-radius: 8px; padding: 14px 16px; transition: background 0.2s;
   }
   .info-section:hover { background: rgba(255, 255, 255, 0.06); }
-
   .info-label {
     font-size: 12px; color: var(--accent, #ffd700);
     font-weight: bold; text-transform: uppercase;
@@ -205,57 +197,32 @@
     display: flex; align-items: center; gap: 8px;
   }
   .info-label .icon { font-size: 16px; }
-  .info-value {
-    font-size: 14px; color: #e0e6ff;
-    line-height: 1.7;
-  }
+  .info-value { font-size: 14px; color: #e0e6ff; line-height: 1.7; }
   .info-value strong { color: #fff; }
 
   .formula-badge {
-    display: inline-block;
-    background: rgba(0, 0, 0, 0.4);
+    display: inline-block; background: rgba(0, 0, 0, 0.4);
     border: 1px solid var(--accent, #ffd700);
     color: var(--accent, #ffd700);
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 4px 10px; border-radius: 6px;
     font-family: 'Courier New', monospace;
-    font-size: 13px;
-    font-weight: bold;
-    margin: 3px 4px 3px 0;
+    font-size: 13px; font-weight: bold; margin: 3px 4px 3px 0;
   }
-
   .ion-badge {
-    display: inline-block;
-    background: rgba(74, 158, 255, 0.15);
-    border: 1px solid #4a9eff;
-    color: #4a9eff;
-    padding: 5px 14px;
-    border-radius: 20px;
-    font-family: 'Arial', sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    margin: 3px 6px 3px 0;
+    display: inline-block; background: rgba(74, 158, 255, 0.15);
+    border: 1px solid #4a9eff; color: #4a9eff;
+    padding: 5px 14px; border-radius: 20px;
+    font-family: 'Arial', sans-serif; font-size: 14px;
+    font-weight: bold; margin: 3px 6px 3px 0;
   }
 
-  .symptom-box {
-    display: flex; gap: 10px; margin-top: 6px;
+  .symptom-box { display: flex; gap: 10px; margin-top: 6px; }
+  .symptom-def, .symptom-tox {
+    flex: 1; border-radius: 8px; padding: 10px 12px;
   }
-  .symptom-def {
-    flex: 1;
-    background: rgba(255, 107, 107, 0.1);
-    border: 1px solid rgba(255, 107, 107, 0.3);
-    border-radius: 8px; padding: 10px 12px;
-  }
-  .symptom-tox {
-    flex: 1;
-    background: rgba(255, 165, 0, 0.1);
-    border: 1px solid rgba(255, 165, 0, 0.3);
-    border-radius: 8px; padding: 10px 12px;
-  }
-  .symptom-title {
-    font-size: 11px; font-weight: bold;
-    margin-bottom: 6px; letter-spacing: 0.5px;
-  }
+  .symptom-def { background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); }
+  .symptom-tox { background: rgba(255, 165, 0, 0.1); border: 1px solid rgba(255, 165, 0, 0.3); }
+  .symptom-title { font-size: 11px; font-weight: bold; margin-bottom: 6px; letter-spacing: 0.5px; }
   .symptom-def .symptom-title { color: #ff6b6b; }
   .symptom-tox .symptom-title { color: #ffa500; }
   .symptom-text { font-size: 13px; color: #dde4ff; line-height: 1.5; }
@@ -271,9 +238,89 @@
 
   #modal::-webkit-scrollbar { width: 8px; }
   #modal::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
-  #modal::-webkit-scrollbar-thumb {
-    background: var(--accent, #ffd700);
-    border-radius: 4px;
+  #modal::-webkit-scrollbar-thumb { background: var(--accent, #ffd700); border-radius: 4px; }
+
+  #video-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+    z-index: 300; padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+  #video-backdrop.show { display: flex; }
+
+  #video-modal {
+    background: #0a0e27;
+    border-radius: 16px;
+    max-width: 900px; width: 100%;
+    border: 2px solid #ff6b6b;
+    box-shadow: 0 20px 80px rgba(255, 107, 107, 0.4);
+    overflow: hidden;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  #video-modal-header {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), transparent);
+    border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  #video-modal-header h2 {
+    font-size: 16px; color: #ff6b6b;
+    display: flex; align-items: center; gap: 10px;
+  }
+  #video-close {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255, 107, 107, 0.15);
+    border: 1px solid rgba(255, 107, 107, 0.4);
+    color: #ff6b6b; font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  #video-close:hover { background: #ff6b6b; color: #fff; transform: rotate(90deg); }
+
+  #video-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+  #video-container iframe,
+  #video-container video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border: none;
+  }
+
+  #video-modal-footer {
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 107, 107, 0.2);
+    font-size: 12px; color: #8899bb;
+    text-align: center;
+  }
+
+  .video-mineral-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #ff6b6b, #c0392b);
+    border: 1px solid #ff6b6b;
+    color: #fff; font-size: 13px; font-weight: bold;
+    padding: 10px 20px; border-radius: 8px;
+    cursor: pointer; margin-top: 8px;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+  }
+  .video-mineral-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 107, 107, 0.5);
+  }
+  .video-mineral-btn .play-icon {
+    width: 0; height: 0;
+    border-left: 10px solid #fff;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
   }
 
   @media (max-width: 768px) {
@@ -287,6 +334,8 @@
     #modal-body { padding: 16px 18px; }
     #modal-header { padding: 18px 20px 14px; }
     .symptom-box { flex-direction: column; }
+    #video-btn { font-size: 12px; padding: 10px 18px; }
+    #video-btn .play-icon { border-left-width: 10px; border-top-width: 6px; border-bottom-width: 6px; }
   }
 </style>
 </head>
@@ -298,6 +347,11 @@
 </div>
 
 <div id="canvas-container"></div>
+
+<button id="video-btn">
+  <span class="play-icon"></span>
+  Video එක බලන්න
+</button>
 
 <div id="title">
   <h1>🌳 MS මාධ්‍යය - මූලද්‍රව්‍ය ගස</h1>
@@ -319,7 +373,6 @@
   <b>🖱️ Drag:</b> Rotate &nbsp;|&nbsp; <b>Scroll:</b> Zoom &nbsp;|&nbsp; <b>Click:</b> Info
 </div>
 
-<!-- ── MODAL ── -->
 <div id="modal-backdrop">
   <div id="modal">
     <button id="modal-close">✕</button>
@@ -368,6 +421,26 @@
           <div class="remedy-text" id="m-remedy"></div>
         </div>
       </div>
+      <div class="info-section" id="m-video-section" style="display:none;">
+        <div class="info-label"><span class="icon">🎥</span> මේ මූලද්‍රව්‍යය ගැන Video</div>
+        <button class="video-mineral-btn" id="m-video-btn">
+          <span class="play-icon"></span>
+          <span id="m-video-btn-text">Video එක බලන්න</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="video-backdrop">
+  <div id="video-modal">
+    <div id="video-modal-header">
+      <h2>🎥 <span id="video-title">MS මාධ්‍යය ගැන Video</span></h2>
+      <button id="video-close">✕</button>
+    </div>
+    <div id="video-container"></div>
+    <div id="video-modal-footer">
+      💡 Tip: Video එක load වෙන්න තත්පර කිහිපයක් ගත විය හැක
     </div>
   </div>
 </div>
@@ -387,196 +460,150 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
 // ============================================================
-// 1. MINERAL INFO DATABASE (ඔබේ document එකෙන්)
+// VIDEO CONFIG — ඔබේ YouTube Video ID එක මෙතන!
+// ============================================================
+const VIDEO_CONFIG = {
+  youtubeId: 'rmPaueN_jIg',
+  localFile: '',
+  title: 'MS මාධ්‍යය ගැන Video'
+};
+
+const MINERAL_VIDEOS = {
+  // උදා: 'N': 'https://www.youtube.com/watch?v=xxxxx',
+};
+
+// ============================================================
+// MINERAL INFO
 // ============================================================
 const MINERAL_INFO = {
   N: {
-    sinhala: 'නයිට්‍රජන්',
-    english: 'Nitrogen',
-    color: '#ffd700',
-    type: 'මහ පෝෂක',
-    chemical: ['NH₄NO₃', 'KNO₃'],
-    ion: ['NH₄⁺', 'NO₃⁻'],
+    sinhala: 'නයිට්‍රජන්', english: 'Nitrogen', color: '#ffd700', type: 'මහ පෝෂක',
+    chemical: ['NH₄NO₃', 'KNO₃'], ion: ['NH₄⁺', 'NO₃⁻'],
     parts: 'කොළ, කඳ, දළු',
-    function: 'ප්‍රෝටීන්, ක්ලෝරොෆිල්, න්‍යෂ්ටික අම්ල (DNA/RNA) සහ එන්සයිම නිර්මාණයට අත්‍යවශ්‍ය වේ. ශාකයේ ප්‍රධාන වර්ධනයට සහ කොළවල හරිත වර්ණය රැක ගැනීමට උපකාරී වේ.',
+    function: 'ප්‍රෝටීන්, ක්ලෝරොෆිල්, න්‍යෂ්ටික අම්ල (DNA/RNA) සහ එන්සයිම නිර්මාණයට අත්‍යවශ්‍ය වේ.',
     deficiency: 'කොළ කහ වීම, වර්ධනය අඩාල වීම',
-    toxicity: 'අධික කොළ වර්ධනය, ප්‍රමාද වූ මල් පිපීම',
-    remedy: 'සාන්ද්‍රණය නිවැරදි කිරීම. NH₄NO₃ / KNO₃ ප්‍රමාණය සමතුලිත කරන්න.'
+    toxicity: 'අධික කොළ වර්ධනය',
+    remedy: 'සාන්ද්‍රණය නිවැරදි කිරීම'
   },
   P: {
-    sinhala: 'පොස්පරස්',
-    english: 'Phosphorus',
-    color: '#ff3333',
-    type: 'මහ පෝෂක',
-    chemical: ['KH₂PO₄'],
-    ion: ['H₂PO₄⁻'],
+    sinhala: 'පොස්පරස්', english: 'Phosphorus', color: '#ff3333', type: 'මහ පෝෂක',
+    chemical: ['KH₂PO₄'], ion: ['H₂PO₄⁻'],
     parts: 'මුල්, දළු, බීජ',
-    function: 'ATP (ශක්ති අණු), න්‍යෂ්ටික අම්ල සහ පටල (membrane) නිර්මාණයට අවශ්‍යයි. මුල් වර්ධනය, මල් පිපීම සහ බීජ සෑදීමට උපකාරී වේ.',
-    deficiency: 'කොළ තද කොළ පැහැයට හැරීම, මුල් වර්ධනය අඩාල වීම',
-    toxicity: 'Fe සහ Zn ඌනතා ඇති කරයි',
+    function: 'ATP (ශක්ති අණු), න්‍යෂ්ටික අම්ල සහ පටල නිර්මාණයට අවශ්‍යයි.',
+    deficiency: 'කොළ තද කොළ පැහැය, මුල් වර්ධනය අඩාල',
+    toxicity: 'Fe සහ Zn ඌනතා',
     remedy: 'KH₂PO₄ මට්ටම නිවැරදි කිරීම'
   },
   K: {
-    sinhala: 'පොටෑසියම්',
-    english: 'Potassium',
-    color: '#f39c12',
-    type: 'මහ පෝෂක',
-    chemical: ['KNO₃'],
-    ion: ['K⁺'],
-    parts: 'පත්‍ර සිදුරු (stomata), කඳ, මුල්',
-    function: 'පත්‍ර සිදුරු විවෘත/වැසීම පාලනය, ජල ප්‍රවාහනය, එන්සයිම ක්‍රියාකාරීත්වය සහ රෝග ප්‍රතිරෝධීතාවයට උපකාරී වේ.',
-    deficiency: 'කොළ දාර පිළිස්සීම, දුර්වල කඳ',
-    toxicity: 'Ca සහ Mg ඌනතා ඇති කරයි',
-    remedy: 'KNO₃ සාන්ද්‍රණය පාලනය කරන්න'
+    sinhala: 'පොටෑසියම්', english: 'Potassium', color: '#f39c12', type: 'මහ පෝෂක',
+    chemical: ['KNO₃'], ion: ['K⁺'],
+    parts: 'පත්‍ර සිදුරු, කඳ, මුල්',
+    function: 'පත්‍ර සිදුරු විවෘත/වැසීම පාලනය, ජල ප්‍රවාහනය සහ රෝග ප්‍රතිරෝධීතාවය.',
+    deficiency: 'කොළ දාර පිළිස්සීම',
+    toxicity: 'Ca සහ Mg ඌනතා',
+    remedy: 'KNO₃ සාන්ද්‍රණය පාලනය'
   },
   Ca: {
-    sinhala: 'කැල්සියම්',
-    english: 'Calcium',
-    color: '#ff69b4',
-    type: 'මහ පෝෂක',
-    chemical: ['CaCl₂ · 2H₂O'],
-    ion: ['Ca²⁺'],
+    sinhala: 'කැල්සියම්', english: 'Calcium', color: '#ff69b4', type: 'මහ පෝෂක',
+    chemical: ['CaCl₂ · 2H₂O'], ion: ['Ca²⁺'],
     parts: 'සෛල බිත්ති, මුල් කෙළවර, දළු මුදුන',
-    function: 'සෛල බිත්ති සකස් කිරීම, සෛල බෙදීම සහ දිගු වීම පාලනය. ශාකයේ ව්‍යුහය ශක්තිමත් කරයි.',
-    deficiency: 'දළු මුදුන මැරීම, නැවුම් කොළ විකෘති වීම',
-    toxicity: 'Mg සහ Fe ඌනතා ඇති කරයි',
-    remedy: 'CaCl₂ · 2H₂O ප්‍රමාණය වැඩි කරන්න'
+    function: 'සෛල බිත්ති සකස් කිරීම සහ සෛල බෙදීම පාලනය.',
+    deficiency: 'දළු මුදුන මැරීම',
+    toxicity: 'Mg සහ Fe ඌනතා',
+    remedy: 'CaCl₂ · 2H₂O වැඩි කරන්න'
   },
   Mg: {
-    sinhala: 'මැග්නීසියම්',
-    english: 'Magnesium',
-    color: '#9b59b6',
-    type: 'මහ පෝෂක',
-    chemical: ['MgSO₄ · 7H₂O'],
-    ion: ['Mg²⁺'],
+    sinhala: 'මැග්නීසියම්', english: 'Magnesium', color: '#9b59b6', type: 'මහ පෝෂක',
+    chemical: ['MgSO₄ · 7H₂O'], ion: ['Mg²⁺'],
     parts: 'ක්ලෝරොෆිල්, පැරණි කොළ',
-    function: 'ක්ලෝරොෆිල් අණුවේ මධ්‍යම පරමාණුවයි. ප්‍රකාශ සංශ්ලේෂණයට සහ එන්සයිම ක්‍රියාකාරීත්වයට අත්‍යවශ්‍යයි.',
-    deficiency: 'නාරටි අතර කහ වීම (interveinal chlorosis)',
-    toxicity: 'Ca ඌනතා ඇති කරයි',
-    remedy: 'MgSO₄ · 7H₂O පාලනය කරන්න'
+    function: 'ක්ලෝරොෆිල් අණුවේ මධ්‍යම පරමාණුවයි. ප්‍රකාශ සංශ්ලේෂණයට අත්‍යවශ්‍යයි.',
+    deficiency: 'නාරටි අතර කහ වීම',
+    toxicity: 'Ca ඌනතා',
+    remedy: 'MgSO₄ · 7H₂O පාලනය'
   },
   S: {
-    sinhala: 'සල්ෆර්',
-    english: 'Sulfur',
-    color: '#f1c40f',
-    type: 'මහ පෝෂක',
-    chemical: ['MgSO₄ · 7H₂O', 'MnSO₄'],
-    ion: ['SO₄²⁻'],
+    sinhala: 'සල්ෆර්', english: 'Sulfur', color: '#f1c40f', type: 'මහ පෝෂක',
+    chemical: ['MgSO₄ · 7H₂O', 'MnSO₄'], ion: ['SO₄²⁻'],
     parts: 'කොළ, ප්‍රෝටීන්',
-    function: 'සල්ෆර් අඩංගු ඇමයිනෝ අම්ල (cysteine, methionine) සහ එන්සයිම නිර්මාණයට උපකාරී වේ. රස සහ ගන්ධය සඳහා වගකියයි.',
-    deficiency: 'තරුණ කොළ කහ වීම, වර්ධනය අඩාල වීම',
-    toxicity: 'කලාතුරකින් — කොළ දාර පිළිස්සීම',
+    function: 'සල්ෆර් අඩංගු ඇමයිනෝ අම්ල සහ එන්සයිම නිර්මාණයට උපකාරී වේ.',
+    deficiency: 'තරුණ කොළ කහ වීම',
+    toxicity: 'කලාතුරකින්',
     remedy: 'MgSO₄ ප්‍රමාණය සමතුලිත කරන්න'
   },
   Fe: {
-    sinhala: 'යකඩ',
-    english: 'Iron',
-    color: '#2c3e50',
-    type: 'සුළු පෝෂක',
-    chemical: ['FeSO₄ · 7H₂O + Na₂EDTA'],
-    ion: ['Fe-EDTA'],
+    sinhala: 'යකඩ', english: 'Iron', color: '#2c3e50', type: 'සුළු පෝෂක',
+    chemical: ['FeSO₄ · 7H₂O + Na₂EDTA'], ion: ['Fe-EDTA'],
     parts: 'තරුණ කොළ, ක්ලෝරොෆිල්',
-    function: 'ක්ලෝරොෆිල් නිර්මාණයට සහ ප්‍රකාශ සංශ්ලේෂණයට අත්‍යවශ්‍යයි. සයිටොක්‍රෝම් එන්සයිමවල කොටසකි.',
-    deficiency: 'සම්පූර්ණ කොළ කහ වීම (තරුණ කොළවලින් පටන්)',
-    toxicity: 'කොළ කළු වීම, මුල් හානි',
-    remedy: 'Fe-EDTA නිවැරදිව ලබා දීම. pH පරීක්ෂා කරන්න.'
+    function: 'ක්ලෝරොෆිල් නිර්මාණයට සහ ප්‍රකාශ සංශ්ලේෂණයට අත්‍යවශ්‍යයි.',
+    deficiency: 'සම්පූර්ණ කොළ කහ වීම',
+    toxicity: 'කොළ කළු වීම',
+    remedy: 'Fe-EDTA නිවැරදිව ලබා දීම'
   },
   Cl: {
-    sinhala: 'ක්ලෝරීන්',
-    english: 'Chlorine',
-    color: '#7f8c8d',
-    type: 'සුළු පෝෂක',
-    chemical: ['CaCl₂ · 2H₂O'],
-    ion: ['Cl⁻'],
+    sinhala: 'ක්ලෝරීන්', english: 'Chlorine', color: '#7f8c8d', type: 'සුළු පෝෂක',
+    chemical: ['CaCl₂ · 2H₂O'], ion: ['Cl⁻'],
     parts: 'කොළ, මුල්',
-    function: 'ප්‍රකාශ සංශ්ලේෂණයේ ජල විච්ඡේදන ප්‍රතික්‍රියාවට උපකාරී වේ. සෛල තුළ අයන සමතුලිතතාවය රැක ගනී.',
-    deficiency: 'කොළ මැලවීම, මුල් වර්ධනය අඩාල',
+    function: 'ප්‍රකාශ සංශ්ලේෂණයේ ජල විච්ඡේදන ප්‍රතික්‍රියාවට උපකාරී වේ.',
+    deficiency: 'කොළ මැලවීම',
     toxicity: 'කොළ දාර පිළිස්සීම',
     remedy: 'CaCl₂ සාන්ද්‍රණය පාලනය'
   },
   Mn: {
-    sinhala: 'මැංගනීස්',
-    english: 'Manganese',
-    color: '#ff1493',
-    type: 'සුළු පෝෂක',
-    chemical: ['MnSO₄ · H₂O'],
-    ion: ['Mn²⁺'],
+    sinhala: 'මැංගනීස්', english: 'Manganese', color: '#ff1493', type: 'සුළු පෝෂක',
+    chemical: ['MnSO₄ · H₂O'], ion: ['Mn²⁺'],
     parts: 'කොළ (ප්‍රකාශ සංශ්ලේෂණය)',
-    function: 'ප්‍රකාශ සංශ්ලේෂණයේ ජල විච්ඡේදනයට සහ නයිට්‍රජන් ජීව ක්‍රියාවලට උපකාරී වේ. එන්සයිම සක්‍රීය කරයි.',
+    function: 'ප්‍රකාශ සංශ්ලේෂණයේ ජල විච්ඡේදනයට සහ නයිට්‍රජන් ජීව ක්‍රියාවලට උපකාරී වේ.',
     deficiency: 'නාරටි අතර කහ වීම, කොළ හැකිලීම',
-    toxicity: 'කොළ දාර පිළිස්සීම, Fe ඌනතාව',
-    remedy: 'MnSO₄ · H₂O ප්‍රමාණය අඩු කරන්න'
+    toxicity: 'කොළ දාර පිළිස්සීම',
+    remedy: 'MnSO₄ · H₂O අඩු කරන්න'
   },
   Zn: {
-    sinhala: 'සින්ක්',
-    english: 'Zinc',
-    color: '#3498db',
-    type: 'සුළු පෝෂක',
-    chemical: ['ZnSO₄ · 7H₂O'],
-    ion: ['Zn²⁺'],
-    parts: 'දළු, ඔස්ට්‍රින් (auxin)',
-    function: 'ඔස්ට්‍රින් හෝමෝනය සංශ්ලේෂණයට සහ එන්සයිම ක්‍රියාකාරීත්වයට උපකාරී වේ. ප්‍රෝටීන් සංශ්ලේෂණයට අවශ්‍යයි.',
-    deficiency: 'කොළ කුඩා වීම, දළු මැරීම (rosette)',
-    toxicity: 'Fe ඌනතාව ඇති කරයි',
-    remedy: 'ZnSO₄ · 7H₂O සාන්ද්‍රණය නිවැරදි කරන්න'
+    sinhala: 'සින්ක්', english: 'Zinc', color: '#3498db', type: 'සුළු පෝෂක',
+    chemical: ['ZnSO₄ · 7H₂O'], ion: ['Zn²⁺'],
+    parts: 'දළු, ඔස්ට්‍රින්',
+    function: 'ඔස්ට්‍රින් හෝමෝනය සංශ්ලේෂණයට උපකාරී වේ.',
+    deficiency: 'කොළ කුඩා වීම, දළු මැරීම',
+    toxicity: 'Fe ඌනතාව',
+    remedy: 'ZnSO₄ · 7H₂O නිවැරදි කරන්න'
   },
   B: {
-    sinhala: 'බෝරෝන්',
-    english: 'Boron',
-    color: '#8b4513',
-    type: 'සුළු පෝෂක',
-    chemical: ['H₃BO₃'],
-    ion: ['H₂BO₃⁻', 'B(OH)₃'],
+    sinhala: 'බෝරෝන්', english: 'Boron', color: '#8b4513', type: 'සුළු පෝෂක',
+    chemical: ['H₃BO₃'], ion: ['H₂BO₃⁻', 'B(OH)₃'],
     parts: 'සෛල බිත්ති, මුදුන්, පරාග',
-    function: 'සෛල බිත්ති සකස් කිරීම, පරාග නාලිකා වර්ධනය සහ සීනි ප්‍රවාහනයට උපකාරී වේ.',
-    deficiency: 'දළු මුදුන මැරීම, කොළ විකෘති වීම, පරාග අසාර්ථක වීම',
-    toxicity: 'කොළ දාර පිළිස්සීම, කොළ කහ වීම',
-    remedy: 'H₃BO₃ සාන්ද්‍රණය අඩු කරන්න — ඉතා සංවේදීයි!'
+    function: 'සෛල බිත්ති සකස් කිරීම සහ පරාග නාලිකා වර්ධනයට උපකාරී වේ.',
+    deficiency: 'දළු මුදුන මැරීම, කොළ විකෘති වීම',
+    toxicity: 'කොළ දාර පිළිස්සීම',
+    remedy: 'H₃BO₃ සාන්ද්‍රණය අඩු කරන්න'
   },
   Mo: {
-    sinhala: 'මොලිබ්ඩිනම්',
-    english: 'Molybdenum',
-    color: '#bb8fce',
-    type: 'සුළු පෝෂක',
-    chemical: ['Na₂MoO₄'],
-    ion: ['MoO₄²⁻'],
+    sinhala: 'මොලිබ්ඩිනම්', english: 'Molybdenum', color: '#bb8fce', type: 'සුළු පෝෂක',
+    chemical: ['Na₂MoO₄'], ion: ['MoO₄²⁻'],
     parts: 'නයිට්‍රජන් ජීව ක්‍රියා',
-    function: 'නයිට්‍රේට් රිඩක්ටේස් එන්සයිමයට අවශ්‍යයි. නයිට්‍රජන් ජීව විද්‍යාත්මක ක්‍රියාවලියට උපකාරී වේ.',
+    function: 'නයිට්‍රේට් රිඩක්ටේස් එන්සයිමයට අවශ්‍යයි.',
     deficiency: 'N ඌනතාවට සමාන ලක්ෂණ',
     toxicity: 'දුර්ලභ',
     remedy: 'Na₂MoO₄ නිවැරදි කරන්න'
   },
   Cu: {
-    sinhala: 'තඹ',
-    english: 'Copper',
-    color: '#16a085',
-    type: 'සුළු පෝෂක',
-    chemical: ['CuSO₄ · 5H₂O'],
-    ion: ['Cu²⁺'],
+    sinhala: 'තඹ', english: 'Copper', color: '#16a085', type: 'සුළු පෝෂක',
+    chemical: ['CuSO₄ · 5H₂O'], ion: ['Cu²⁺'],
     parts: 'එන්සයිම, මුල්',
-    function: 'එන්සයිම ක්‍රියාකාරීත්වයට සහ ක්ලෝරොෆිල් නිර්මාණයට උපකාරී වේ. ප්‍රෝටීන් සහ කාබෝහයිඩ්‍රේට ජීව ක්‍රියාවලට සම්බන්ධයි.',
-    deficiency: 'තරුණ කොළ මැරීම, දළු මැරීම',
+    function: 'එන්සයිම ක්‍රියාකාරීත්වයට සහ ක්ලෝරොෆිල් නිර්මාණයට උපකාරී වේ.',
+    deficiency: 'තරුණ කොළ මැරීම',
     toxicity: 'මුල් වර්ධනය නැවතීම',
     remedy: 'CuSO₄ · 5H₂O පාලනය'
   },
   Co: {
-    sinhala: 'කොබෝල්ට්',
-    english: 'Cobalt',
-    color: '#5d6d7e',
-    type: 'සුළු පෝෂක',
-    chemical: ['CoCl₂'],
-    ion: ['Co²⁺'],
+    sinhala: 'කොබෝල්ට්', english: 'Cobalt', color: '#5d6d7e', type: 'සුළු පෝෂක',
+    chemical: ['CoCl₂'], ion: ['Co²⁺'],
     parts: 'සමහර එන්සයිම',
-    function: 'විටමින් B12 සංශ්ලේෂණයට සහ නයිට්‍රජන් ස්ථාවර කිරීමට උපකාරී වේ. (සාමාන්‍යයෙන් ඉතා අල්ප වශයෙන් අවශ්‍යයි)',
-    deficiency: 'දුර්ලභ — වර්ධනය අඩාල වීම',
+    function: 'විටමින් B12 සංශ්ලේෂණයට උපකාරී වේ.',
+    deficiency: 'දුර්ලභ',
     toxicity: 'දුර්ලභ',
     remedy: 'CoCl₂ නිවැරදි කරන්න'
   }
 };
 
-// ============================================================
-// 2. TREE MINERAL POSITIONS
-// ============================================================
 const MINERALS = [
   { sym: 'Mg', color: 0x9b59b6, pos: { a:  -60, h: 8.5, r: 3.2 } },
   { sym: 'K',  color: 0xf39c12, pos: { a:  -20, h: 8.8, r: 3.0 } },
@@ -595,9 +622,6 @@ const MINERALS = [
   { sym: 'Mg', color: 0x9b59b6, pos: { a:   65, h: 3.5, r: 4.0 } },
 ];
 
-// ============================================================
-// 3. SCENE SETUP
-// ============================================================
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0e27);
@@ -628,11 +652,7 @@ controls.maxDistance = 45;
 controls.maxPolarAngle = Math.PI / 2.1;
 controls.target.set(0, 6, 0);
 
-// ============================================================
-// 4. LIGHTING
-// ============================================================
 scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
 const mainLight = new THREE.DirectionalLight(0xfff5e0, 1.2);
 mainLight.position.set(10, 20, 10);
 mainLight.castShadow = true;
@@ -651,19 +671,18 @@ const rimLight = new THREE.PointLight(0xffd700, 0.6, 30);
 rimLight.position.set(0, 15, -8);
 scene.add(rimLight);
 
-// ============================================================
-// 5. GROUND
-// ============================================================
-const soilGeo = new THREE.CylinderGeometry(12, 12, 1.2, 64);
-const soilMat = new THREE.MeshStandardMaterial({ color: 0xdaa520, roughness: 0.95, metalness: 0.05 });
-const soil = new THREE.Mesh(soilGeo, soilMat);
+const soil = new THREE.Mesh(
+  new THREE.CylinderGeometry(12, 12, 1.2, 64),
+  new THREE.MeshStandardMaterial({ color: 0xdaa520, roughness: 0.95, metalness: 0.05 })
+);
 soil.position.y = -0.6;
 soil.receiveShadow = true;
 scene.add(soil);
 
-const baseGeo = new THREE.CylinderGeometry(12.5, 12.5, 0.8, 64);
-const baseMat = new THREE.MeshStandardMaterial({ color: 0x5d3a1a, roughness: 1.0 });
-const base = new THREE.Mesh(baseGeo, baseMat);
+const base = new THREE.Mesh(
+  new THREE.CylinderGeometry(12.5, 12.5, 0.8, 64),
+  new THREE.MeshStandardMaterial({ color: 0x5d3a1a, roughness: 1.0 })
+);
 base.position.y = -1.4;
 base.receiveShadow = true;
 scene.add(base);
@@ -671,19 +690,17 @@ scene.add(base);
 for (let i = 0; i < 60; i++) {
   const r = Math.random() * 10 + 1.5;
   const a = Math.random() * Math.PI * 2;
-  const rockGeo = new THREE.DodecahedronGeometry(0.08 + Math.random() * 0.12);
-  const rockMat = new THREE.MeshStandardMaterial({
-    color: Math.random() > 0.5 ? 0x8b6914 : 0x6b4423, roughness: 1
-  });
-  const rock = new THREE.Mesh(rockGeo, rockMat);
+  const rock = new THREE.Mesh(
+    new THREE.DodecahedronGeometry(0.08 + Math.random() * 0.12),
+    new THREE.MeshStandardMaterial({
+      color: Math.random() > 0.5 ? 0x8b6914 : 0x6b4423, roughness: 1
+    })
+  );
   rock.position.set(Math.cos(a) * r, -0.05, Math.sin(a) * r);
   rock.rotation.set(Math.random(), Math.random(), Math.random());
   scene.add(rock);
 }
 
-// ============================================================
-// 6. TREE
-// ============================================================
 const treeGroup = new THREE.Group();
 scene.add(treeGroup);
 
@@ -695,16 +712,13 @@ function createTrunk() {
     const t = i / 10;
     points.push(new THREE.Vector2(0.9 * (1 - t * 0.6), t * 6));
   }
-  const trunkGeo = new THREE.LatheGeometry(points, 24);
-  const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-  trunk.castShadow = true;
-  trunk.receiveShadow = true;
+  const trunk = new THREE.Mesh(new THREE.LatheGeometry(points, 24), trunkMat);
+  trunk.castShadow = true; trunk.receiveShadow = true;
   treeGroup.add(trunk);
 
   for (let i = 0; i < 7; i++) {
     const angle = (i / 7) * Math.PI * 2 + Math.random() * 0.5;
-    const rootGeo = new THREE.CylinderGeometry(0.35, 0.05, 2.5, 8);
-    const root = new THREE.Mesh(rootGeo, trunkMat);
+    const root = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.05, 2.5, 8), trunkMat);
     root.position.set(Math.cos(angle) * 0.7, 0.3, Math.sin(angle) * 0.7);
     root.rotation.z = Math.cos(angle) * 1.3;
     root.rotation.x = -Math.sin(angle) * 1.3;
@@ -718,9 +732,7 @@ function createBranch(startPos, direction, length, radius, depth) {
   if (depth > 3 || length < 0.5) return;
   const endPos = startPos.clone().add(direction.clone().multiplyScalar(length));
   const midPos = startPos.clone().add(endPos).multiplyScalar(0.5);
-
-  const branchGeo = new THREE.CylinderGeometry(radius * 0.6, radius, length, 6);
-  const branch = new THREE.Mesh(branchGeo, trunkMat);
+  const branch = new THREE.Mesh(new THREE.CylinderGeometry(radius * 0.6, radius, length, 6), trunkMat);
   branch.position.copy(midPos);
   branch.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
   branch.castShadow = true;
@@ -743,7 +755,6 @@ for (let i = 0; i < 5; i++) {
   createBranch(new THREE.Vector3(0, 4.5 + Math.random() * 0.5, 0), dir, 2.5, 0.35, 0);
 }
 
-// Foliage
 const leafMat = new THREE.MeshStandardMaterial({ color: 0x2ecc71, roughness: 0.8, metalness: 0.05, flatShading: true });
 const leafMatDark = new THREE.MeshStandardMaterial({ color: 0x1e8449, roughness: 0.85, flatShading: true });
 
@@ -753,16 +764,14 @@ function createLeafCluster(center, radius, count, dark = false) {
     const phi = Math.acos(2 * Math.random() - 1);
     const theta = Math.random() * Math.PI * 2;
     const r = radius * (0.6 + Math.random() * 0.4);
-    const leafGeo = new THREE.IcosahedronGeometry(0.5 + Math.random() * 0.35, 0);
-    const leaf = new THREE.Mesh(leafGeo, mat);
+    const leaf = new THREE.Mesh(new THREE.IcosahedronGeometry(0.5 + Math.random() * 0.35, 0), mat);
     leaf.position.set(
       center.x + r * Math.sin(phi) * Math.cos(theta),
       center.y + r * Math.cos(phi) * 0.7,
       center.z + r * Math.sin(phi) * Math.sin(theta)
     );
     leaf.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
-    leaf.castShadow = true;
-    leaf.receiveShadow = true;
+    leaf.castShadow = true; leaf.receiveShadow = true;
     treeGroup.add(leaf);
   }
 }
@@ -772,42 +781,28 @@ createLeafCluster(new THREE.Vector3(0, 6.0, 0), 4.8, 50, false);
 createLeafCluster(new THREE.Vector3(0, 8.3, 0), 4.2, 40, true);
 createLeafCluster(new THREE.Vector3(0, 10.2, 0), 3.0, 28, false);
 
-// ============================================================
-// 7. MINERAL CUPS (Clickable!)
-// ============================================================
-const clickableObjects = []; // Raycaster targets
+const clickableObjects = [];
 
 function createMineralCup(mineral) {
   const { a, h, r } = mineral.pos;
   const angleRad = (a * Math.PI) / 180;
-  const x = Math.cos(angleRad) * r;
-  const z = Math.sin(angleRad) * r;
-
   const group = new THREE.Group();
-  group.position.set(x, h, z);
+  group.position.set(Math.cos(angleRad) * r, h, Math.sin(angleRad) * r);
   group.userData.mineralKey = mineral.sym;
 
-  // Cup
-  const cupGeo = new THREE.CylinderGeometry(0.65, 0.55, 0.9, 24, 1, true);
   const cupMat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff, transparent: true, opacity: 0.25,
     roughness: 0.1, metalness: 0, transmission: 0.8, side: THREE.DoubleSide
   });
-  const cup = new THREE.Mesh(cupGeo, cupMat);
-  cup.castShadow = true;
-  cup.userData.parentGroup = group;
-  group.add(cup);
-  clickableObjects.push(cup);
+  const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.55, 0.9, 24, 1, true), cupMat);
+  cup.castShadow = true; cup.userData.parentGroup = group;
+  group.add(cup); clickableObjects.push(cup);
 
-  // Bottom
   const bottom = new THREE.Mesh(new THREE.CircleGeometry(0.55, 24), cupMat);
-  bottom.rotation.x = -Math.PI / 2;
-  bottom.position.y = -0.45;
+  bottom.rotation.x = -Math.PI / 2; bottom.position.y = -0.45;
   bottom.userData.parentGroup = group;
-  group.add(bottom);
-  clickableObjects.push(bottom);
+  group.add(bottom); clickableObjects.push(bottom);
 
-  // Beads
   const beadMat = new THREE.MeshStandardMaterial({
     color: mineral.color, roughness: 0.4, metalness: 0.3,
     emissive: mineral.color, emissiveIntensity: 0.15
@@ -817,24 +812,18 @@ function createMineralCup(mineral) {
     const phi = Math.random() * Math.PI * 2;
     const rad = Math.random() * 0.42;
     bead.position.set(Math.cos(phi) * rad, -0.35 + Math.random() * 0.55, Math.sin(phi) * rad);
-    bead.castShadow = true;
-    bead.userData.parentGroup = group;
-    group.add(bead);
-    clickableObjects.push(bead);
+    bead.castShadow = true; bead.userData.parentGroup = group;
+    group.add(bead); clickableObjects.push(bead);
   }
 
-  // Ring
   const ring = new THREE.Mesh(
     new THREE.TorusGeometry(0.65, 0.04, 8, 32),
     new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.3, metalness: 0.8, roughness: 0.2 })
   );
-  ring.rotation.x = Math.PI / 2;
-  ring.position.y = 0.45;
+  ring.rotation.x = Math.PI / 2; ring.position.y = 0.45;
   ring.userData.parentGroup = group;
-  group.add(ring);
-  clickableObjects.push(ring);
+  group.add(ring); clickableObjects.push(ring);
 
-  // Label
   const labelDiv = document.createElement('div');
   labelDiv.textContent = mineral.sym;
   labelDiv.style.cssText = `
@@ -850,7 +839,6 @@ function createMineralCup(mineral) {
   label.position.set(0, -0.85, 0);
   group.add(label);
 
-  // Glow
   const glow = new THREE.PointLight(mineral.color, 0.35, 2.5);
   glow.position.set(0, 0.2, 0);
   group.add(glow);
@@ -863,9 +851,6 @@ function createMineralCup(mineral) {
 
 const mineralGroups = MINERALS.map(createMineralCup);
 
-// ============================================================
-// 8. SOIL CUPS (N, P, K below)
-// ============================================================
 const soilMinerals = [
   { sym: 'K', color: 0xf39c12, x: -1.8, z: 3.5 },
   { sym: 'P', color: 0xff3333, x:  0.0, z: 3.8 },
@@ -881,10 +866,8 @@ soilMinerals.forEach(m => {
     new THREE.CylinderGeometry(0.7, 0.6, 1.0, 24, 1, true),
     new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.3, transmission: 0.7, side: THREE.DoubleSide })
   );
-  cup.castShadow = true;
-  cup.userData.parentGroup = group;
-  group.add(cup);
-  clickableObjects.push(cup);
+  cup.castShadow = true; cup.userData.parentGroup = group;
+  group.add(cup); clickableObjects.push(cup);
 
   const beadMat = new THREE.MeshStandardMaterial({
     color: m.color, roughness: 0.4, metalness: 0.3,
@@ -895,10 +878,8 @@ soilMinerals.forEach(m => {
     const phi = Math.random() * Math.PI * 2;
     const rad = Math.random() * 0.45;
     bead.position.set(Math.cos(phi) * rad, -0.4 + Math.random() * 0.6, Math.sin(phi) * rad);
-    bead.castShadow = true;
-    bead.userData.parentGroup = group;
-    group.add(bead);
-    clickableObjects.push(bead);
+    bead.castShadow = true; bead.userData.parentGroup = group;
+    group.add(bead); clickableObjects.push(bead);
   }
 
   const labelDiv = document.createElement('div');
@@ -908,8 +889,7 @@ soilMinerals.forEach(m => {
     color: #ffd700; font-weight: bold; font-size: 14px;
     padding: 3px 10px; border-radius: 6px;
     border: 1.5px solid #${m.color.toString(16).padStart(6, '0')};
-    font-family: Arial, sans-serif;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    font-family: Arial, sans-serif; box-shadow: 0 2px 8px rgba(0,0,0,0.6);
     pointer-events: none;
   `;
   const label = new CSS2DObject(labelDiv);
@@ -919,9 +899,6 @@ soilMinerals.forEach(m => {
   scene.add(group);
 });
 
-// ============================================================
-// 9. TITLE LABEL
-// ============================================================
 const titleDiv = document.createElement('div');
 titleDiv.innerHTML = '🌳 මූලද්‍රව්‍ය <span style="font-size:11px;">(මිනිරල් පෝෂක)</span>';
 titleDiv.style.cssText = `
@@ -936,13 +913,9 @@ const titleLabel = new CSS2DObject(titleDiv);
 titleLabel.position.set(4.5, 13.5, 0);
 scene.add(titleLabel);
 
-// ============================================================
-// 10. PARTICLES
-// ============================================================
 const particleGeo = new THREE.BufferGeometry();
-const particleCount = 300;
-const particlePositions = new Float32Array(particleCount * 3);
-for (let i = 0; i < particleCount; i++) {
+const particlePositions = new Float32Array(300 * 3);
+for (let i = 0; i < 300; i++) {
   particlePositions[i * 3]     = (Math.random() - 0.5) * 40;
   particlePositions[i * 3 + 1] = Math.random() * 25;
   particlePositions[i * 3 + 2] = (Math.random() - 0.5) * 40;
@@ -954,17 +927,14 @@ const particles = new THREE.Points(particleGeo, new THREE.PointsMaterial({
 }));
 scene.add(particles);
 
-// ============================================================
-// 11. LEGEND (Clickable)
-// ============================================================
 const legendContainer = document.getElementById('legend-items');
 const legendData = [
-  { sym: 'N',  color: '#ffd700' }, { sym: 'P',  color: '#ff3333' },
-  { sym: 'K',  color: '#f39c12' }, { sym: 'Ca', color: '#ff69b4' },
-  { sym: 'Mg', color: '#9b59b6' }, { sym: 'S',  color: '#f1c40f' },
+  { sym: 'N', color: '#ffd700' }, { sym: 'P', color: '#ff3333' },
+  { sym: 'K', color: '#f39c12' }, { sym: 'Ca', color: '#ff69b4' },
+  { sym: 'Mg', color: '#9b59b6' }, { sym: 'S', color: '#f1c40f' },
   { sym: 'Fe', color: '#2c3e50' }, { sym: 'Cl', color: '#7f8c8d' },
   { sym: 'Mn', color: '#ff1493' }, { sym: 'Zn', color: '#3498db' },
-  { sym: 'B',  color: '#8b4513' }, { sym: 'Mo', color: '#bb8fce' },
+  { sym: 'B', color: '#8b4513' }, { sym: 'Mo', color: '#bb8fce' },
   { sym: 'Cu', color: '#16a085' }, { sym: 'Co', color: '#5d6d7e' },
 ];
 
@@ -980,9 +950,6 @@ legendData.forEach(item => {
   legendContainer.appendChild(div);
 });
 
-// ============================================================
-// 12. RAYCASTER (Click detection)
-// ============================================================
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 let hoveredGroup = null;
@@ -990,7 +957,6 @@ let hoveredGroup = null;
 renderer.domElement.addEventListener('pointermove', (e) => {
   mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-
   raycaster.setFromCamera(mouse, camera);
   const hits = raycaster.intersectObjects(clickableObjects, false);
 
@@ -1003,16 +969,12 @@ renderer.domElement.addEventListener('pointermove', (e) => {
       renderer.domElement.style.cursor = 'pointer';
     }
   } else {
-    if (hoveredGroup) {
-      hoveredGroup.scale.setScalar(1);
-      hoveredGroup = null;
-    }
+    if (hoveredGroup) { hoveredGroup.scale.setScalar(1); hoveredGroup = null; }
     renderer.domElement.style.cursor = 'grab';
   }
 });
 
 renderer.domElement.addEventListener('pointerdown', (e) => {
-  // Only handle left click and no big drag
   if (e.button !== 0) return;
   mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -1020,27 +982,21 @@ renderer.domElement.addEventListener('pointerdown', (e) => {
   const hits = raycaster.intersectObjects(clickableObjects, false);
   if (hits.length > 0) {
     const grp = hits[0].object.userData.parentGroup;
-    if (grp && grp.userData.mineralKey) {
-      openModal(grp.userData.mineralKey);
-    }
+    if (grp && grp.userData.mineralKey) openModal(grp.userData.mineralKey);
   }
 });
 
-// ============================================================
-// 13. MODAL LOGIC
-// ============================================================
 const backdrop = document.getElementById('modal-backdrop');
 const modal = document.getElementById('modal');
+let currentMineralKey = null;
 
 function openModal(sym) {
   const info = MINERAL_INFO[sym];
   if (!info) return;
+  currentMineralKey = sym;
 
-  // Set CSS variables for accent color
   modal.style.setProperty('--accent', info.color);
-  // Create glow with alpha
-  const glow = hexToRgba(info.color, 0.35);
-  modal.style.setProperty('--accent-glow', glow);
+  modal.style.setProperty('--accent-glow', hexToRgba(info.color, 0.35));
 
   document.getElementById('modal-symbol').textContent = sym;
   document.getElementById('modal-name').textContent = info.sinhala;
@@ -1050,27 +1006,26 @@ function openModal(sym) {
   typeBadge.textContent = info.type;
   typeBadge.classList.toggle('micro', info.type.includes('සුළු'));
 
-  // Chemical formulas
-  document.getElementById('m-chemical').innerHTML =
-    info.chemical.map(c => `<span class="formula-badge">${c}</span>`).join('');
-
-  // Ions
-  document.getElementById('m-ion').innerHTML =
-    info.ion.map(i => `<span class="ion-badge">${i}</span>`).join('');
-
+  document.getElementById('m-chemical').innerHTML = info.chemical.map(c => `<span class="formula-badge">${c}</span>`).join('');
+  document.getElementById('m-ion').innerHTML = info.ion.map(i => `<span class="ion-badge">${i}</span>`).join('');
   document.getElementById('m-parts').textContent = info.parts;
   document.getElementById('m-function').textContent = info.function;
   document.getElementById('m-deficiency').textContent = info.deficiency;
   document.getElementById('m-toxicity').textContent = info.toxicity;
   document.getElementById('m-remedy').textContent = info.remedy;
 
+  const videoSection = document.getElementById('m-video-section');
+  if (MINERAL_VIDEOS[sym]) {
+    videoSection.style.display = 'block';
+    document.getElementById('m-video-btn-text').textContent = `${info.sinhala} ගැන Video බලන්න`;
+  } else {
+    videoSection.style.display = 'none';
+  }
+
   backdrop.classList.add('show');
 }
 
-function closeModal() {
-  backdrop.classList.remove('show');
-}
-
+function closeModal() { backdrop.classList.remove('show'); }
 function hexToRgba(hex, alpha) {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -1079,16 +1034,76 @@ function hexToRgba(hex, alpha) {
 }
 
 document.getElementById('modal-close').addEventListener('click', closeModal);
-backdrop.addEventListener('click', (e) => {
-  if (e.target === backdrop) closeModal();
-});
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeModal();
+backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeModal(); });
+
+document.getElementById('m-video-btn').addEventListener('click', () => {
+  if (currentMineralKey && MINERAL_VIDEOS[currentMineralKey]) {
+    const info = MINERAL_INFO[currentMineralKey];
+    closeModal();
+    setTimeout(() => openVideo(MINERAL_VIDEOS[currentMineralKey], `${info.sinhala} ගැන Video`), 300);
+  }
 });
 
-// ============================================================
-// 14. ANIMATION LOOP
-// ============================================================
+const videoBackdrop = document.getElementById('video-backdrop');
+const videoContainer = document.getElementById('video-container');
+
+function openVideo(url, title) {
+  videoContainer.innerHTML = '';
+
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+
+  if (ytMatch) {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    iframe.allowFullscreen = true;
+    videoContainer.appendChild(iframe);
+  } else {
+    const video = document.createElement('video');
+    video.src = url;
+    video.controls = true;
+    video.autoplay = true;
+    video.playsInline = true;
+    videoContainer.appendChild(video);
+  }
+
+  document.getElementById('video-title').textContent = title || VIDEO_CONFIG.title;
+  videoBackdrop.classList.add('show');
+}
+
+function closeVideo() {
+  videoBackdrop.classList.remove('show');
+  setTimeout(() => { videoContainer.innerHTML = ''; }, 300);
+}
+
+document.getElementById('video-btn').addEventListener('click', () => {
+  let videoSource = '';
+  if (VIDEO_CONFIG.youtubeId) {
+    videoSource = `https://www.youtube.com/watch?v=${VIDEO_CONFIG.youtubeId}`;
+  } else if (VIDEO_CONFIG.localFile) {
+    videoSource = VIDEO_CONFIG.localFile;
+  }
+
+  if (!videoSource) {
+    alert('⚠️ Video එකක් configure කරලා නෑ!\n\nindex.html file එකේ VIDEO_CONFIG කොටසේ\nඔබේ video එකේ details දාන්න.');
+    return;
+  }
+
+  openVideo(videoSource, VIDEO_CONFIG.title);
+});
+
+document.getElementById('video-close').addEventListener('click', closeVideo);
+videoBackdrop.addEventListener('click', (e) => {
+  if (e.target === videoBackdrop) closeVideo();
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeVideo();
+  }
+});
+
 const clock = new THREE.Clock();
 
 function animate() {
@@ -1097,7 +1112,6 @@ function animate() {
 
   mineralGroups.forEach((g) => {
     if (g === hoveredGroup) {
-      // Hover: stop floating, lift slightly
       g.position.y = g.userData.baseY + 0.15;
     } else {
       g.position.y = g.userData.baseY + Math.sin(t * 1.5 + g.userData.floatOffset) * 0.12;
@@ -1113,9 +1127,6 @@ function animate() {
 }
 animate();
 
-// ============================================================
-// 15. RESIZE + LOADING
-// ============================================================
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
